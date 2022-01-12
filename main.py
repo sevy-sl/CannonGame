@@ -2,7 +2,6 @@ import random
 import sys
 import pygame
 from pygame.color import THECOLORS
-from pygame.event import set_allowed
 
 pygame.init()
 
