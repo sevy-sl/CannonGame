@@ -91,14 +91,7 @@ class Target:
             self.numforforw += self.tar_speed
             self.tar_rect.move_ip(self.tar_speed, 0)
         move_forw()
-        
-
-
-        
-
-         
-
-
+    
 
 colors = list(THECOLORS.values())
 rand_color =  random.choice(colors)
