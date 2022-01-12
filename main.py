@@ -1,10 +1,11 @@
 import random
 import sys
-
 import pygame
 from pygame.color import THECOLORS
+from pygame.event import set_allowed
 
 pygame.init()
+
 
 screen = pygame.display.set_mode((640, 480))
 
@@ -23,7 +24,7 @@ class Cannon:
     def draw(self):
         # TODO(1.2): отобразите созданную в __init__ последовательность точек
         #  заданным цветом.
-        pygame.draw.polygon(screen, self.guncolor, self.dotpoints, width=0)
+        pygame.draw.polygon(screen, self.guncolor, self.dotpoints, 0)
         
 
 class Bullet:
@@ -33,25 +34,23 @@ class Bullet:
         #  * Радиус
         #  * Цвет
         #  * Скорость (для тестов использовать значение 3)
-        self.cent = (321, 402)
-        self.rad = 7
+        self.bul_rect = pygame.Rect([316, 400, 9, 9])
         self.bul_color = THECOLORS['green']
-        self.bul_speed = 0.2
+        self.bul_speed = 1
 
     def draw(self):
         # TODO(2.2): отобразите снаряд.
-        pygame.draw.circle(screen, self.bul_color, self.cent, self.rad, width=0)
+        pygame.draw.rect(screen, self.bul_color, self.bul_rect, 0)
 
     def move(self):
         # TODO(2.3): реализуйте перемещение снаряда.
         #  Для этого нужно создать его новый центр со смещением speed по оси OY
         #  к началу коориднат.
-        x, y = self.cent
-        while y >= 10:
-            y = y - self.bul_speed
-            screen.fill(THECOLORS['black'])
-            pygame.draw.circle(screen, self.bul_color, (x, y), self.rad, width=0)
-            pygame.display.flip()
+        while self.bul_rect[1] > 5:
+            self.bul_rect.move_ip(0, -self.bul_speed)
+            Bullet.draw(self)
+        if self.bul_rect[1] == 6:    
+            return('done')
 
 
 class Target:
@@ -61,33 +60,49 @@ class Target:
         #  * Скорость
         #  * Прямоугольник
         self.tar_color = THECOLORS['cyan']
-        self.tar_speed = 8
-        self.rct_atr = (2, 20, 100, 25)
-        self.rct = pygame.Rect(self.rct_atr)
+        self.tar_speed = 7
+        self.numforback = 534
+        self.numforforw = 2
+        self.tar_rect = pygame.Rect([2, 20, 100, 25])
 
     def draw(self):
         # TODO(3.2): отобразите мишень.
-        pygame.draw.rect(screen, self.tar_color, self.rct, width=0,)
+        pygame.draw.rect(screen, self.tar_color, self.tar_rect, 0)
 
     def move(self):
         # TODO(3.3): реализуйте движение мишени.
         #  При достижении края окна мишень должна менять направление движения
         #  на противположное. Это можно реализовать сменой знака сокрости.
-        x, y, z, c = self.rct_atr
-        if x < 539:
-                self.rct.move_ip(self.tar_speed, 0)
-                x += self.tar_speed
-                if x == 538:
-                    self.rct.move_ip(self.tar_speed, 0)
-                    x -= self.tar_speed
+        def move_back():
+            if self.numforback == 2:
+                try:
+                    self.numforforw -= 532
+                    self.numforback += 532  
+                    move_forw()
+                finally:
+                    return
+            self.numforback -= self.tar_speed
+            self.tar_rect.move_ip(-self.tar_speed, 0)
+        def move_forw():
+            if self.numforforw == 534:
+                try:
+                    move_back()
+                finally:
+                    return
+            self.numforforw += self.tar_speed
+            self.tar_rect.move_ip(self.tar_speed, 0)
+        move_forw()
+        
+
 
         
+
+         
 
 
 
 colors = list(THECOLORS.values())
-def get_random_color():
-    return random.choice(colors)
+rand_color =  random.choice(colors)
 
 
 cannon = Cannon()
@@ -106,9 +121,8 @@ while True:
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                bullet.move()
+                bullet.move()                
     # TODO(2.4): если снаряд достиг верхней границы окна, создать новый снаряд.
-
     # TODO(4.1): если мишень и снаряд пересеклись, сменить цвет мишени на
     #  случайный, создать новй снаряд.
     #  Для определения пересечения используйте метод прямоугольника:
