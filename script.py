@@ -86,10 +86,11 @@ while True:
     screen.fill(THECOLORS['black'])
     target.move()
 
-    def recolor():
+    def hit():
         colors = list(THECOLORS.values())
         if pygame.Rect.colliderect(target.tar_rect, bullet.bul_rect) == True:    
             target.tar_color = random.choice(colors)
+            bullet.reload()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -101,7 +102,7 @@ while True:
     
     if pygame.key.get_pressed()[pygame.K_UP]:
         bullet.shoot()
-        recolor()  
+        hit()  
 
     bullet.draw()
     cannon.draw()
